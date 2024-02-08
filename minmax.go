@@ -1,7 +1,5 @@
 package main
 
-import "fmt"
-
 type move struct {
 	x int
 	y int
@@ -52,11 +50,7 @@ func findMaxWithIndex(arr []int) (int, int) {
 	return maxValue, maxIdx
 }
 
-func minmax(board Board, depth int) int {
-	var scores []int
-	var moves []move
-	possibleMoves := getPossibleMoves(board)
-
+func minmax(board Board, depth int) (int, move) {
 	isFirstPlayer := depth%2 == 0
 	var mark Cell
 	if isFirstPlayer {
@@ -64,11 +58,27 @@ func minmax(board Board, depth int) int {
 	} else {
 		mark = Circle
 	}
+	gameState, playerMark := getGameState(board)
+	if gameState == Win {
+		if playerMark == Ex {
+			return 10, move{x: -1, y: -1}
+		} else if playerMark == Circle {
+			return -10, move{x: -1, y: -1}
+		}
+	}
+
+	if gameState == Draw {
+		return 0, move{x: -1, y: -1}
+	}
+
+	var scores []int
+	var moves []move
+	possibleMoves := getPossibleMoves(board)
 
 	newBoard := duplicateBoard(board)
 	for _, currentMove := range possibleMoves {
 		newBoard[currentMove.x][currentMove.y] = mark
-		score := minmax(newBoard, depth+1)
+		score, _ := minmax(newBoard, depth+1)
 		scores = append(scores, score)
 		moves = append(moves, currentMove)
 		newBoard[currentMove.x][currentMove.y] = Empty
@@ -81,6 +91,5 @@ func minmax(board Board, depth int) int {
 		bestValue, bestMoveIdx = findMaxWithIndex(scores)
 	}
 
-	fmt.Printf("Best move is %d %d\n", moves[bestMoveIdx].x, moves[bestMoveIdx].y)
-	return bestValue
+	return bestValue, moves[bestMoveIdx]
 }

@@ -48,42 +48,66 @@ func main() {
 		{Empty, Empty, Empty},
 		{Empty, Empty, Empty},
 	}
-	printBoard(board)
-	// play := -1
-	// plays := 0
-	// currentMark := Ex
 
-	// for plays < 9 {
-	// 	_, err := fmt.Scanf("%d", &play)
-	// 	if err != nil {
-	// 		fmt.Println("Error:", err)
-	// 		return
-	// 	}
-	//
-	// 	if play < 0 || play > 8 {
-	// 		fmt.Println("Please enter a number between 0 and 8")
-	// 		continue
-	// 	}
-	//
-	// 	fmt.Println("")
-	// 	positionX := play / 3
-	// 	positionY := play % 3
-	//
-	// 	if board[positionX][positionY] != Empty {
-	// 		fmt.Println("That position is already occupied, try again")
-	// 		continue
-	// 	}
-	// 	board[positionX][positionY] = currentMark
-	// 	currentMark = changeMark(currentMark)
-	// 	plays += 1
-	// 	boardErr := printBoard(board)
-	// 	if boardErr != nil {
-	// 		fmt.Println("Could not print board, stopping game...")
-	// 	}
-	// 	gameState := getGameState(board)
-	// 	if gameState != "" {
-	// 		fmt.Println(gameState)
-	// 		break
-	// 	}
+	// board := Board{
+	// 	{Ex, Ex, Empty},
+	// 	{Empty, Circle, Empty},
+	// 	{Empty, Circle, Empty},
 	// }
+	printBoard(board)
+	play := -1
+	currentMark := Ex
+
+	for {
+		// User turn
+		_, err := fmt.Scanf("%d", &play)
+		if err != nil {
+			fmt.Println("Error:", err)
+			return
+		}
+
+		if play < 0 || play > 8 {
+			fmt.Println("Please enter a number between 0 and 8")
+			continue
+		}
+
+		fmt.Println("")
+		positionX := play / 3
+		positionY := play % 3
+
+		if board[positionX][positionY] != Empty {
+			fmt.Println("That position is already occupied, try again")
+			continue
+		}
+		board[positionX][positionY] = currentMark
+		gameState, playerState := getGameState(board)
+		if gameState == Win {
+			if playerState == Ex {
+				fmt.Println("Player 1 Won!")
+			} else if playerState == Circle {
+				fmt.Println("Player 2 Won!")
+			}
+			break
+		}
+		if gameState == Draw {
+			fmt.Println("It's a Draw")
+		}
+
+		// CPU turn
+		_, bestMove := minmax(board, 0)
+		board[bestMove.x][bestMove.y] = Circle
+		printBoard(board)
+		gameState, playerState = getGameState(board)
+		if gameState == Win {
+			if playerState == Ex {
+				fmt.Println("Player 1 Won!")
+			} else if playerState == Circle {
+				fmt.Println("Player 2 Won!")
+			}
+			break
+		}
+		if gameState == Draw {
+			fmt.Println("It's a Draw")
+		}
+	}
 }

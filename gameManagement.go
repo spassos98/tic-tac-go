@@ -1,5 +1,13 @@
 package main
 
+type GameState int
+
+const (
+	Win     GameState = iota
+	Draw    GameState = iota
+	Running GameState = iota
+)
+
 func isRowComplete(board Board, mark Cell) bool {
 	for i := 0; i < len(board); i++ {
 		base := board[i][0]
@@ -58,24 +66,45 @@ func isDiagcomplete(board Board, mark Cell) bool {
 	return diag1Complete || diag2Complete
 }
 
-func isGameOver(board Board) int {
-
-	return 0
+func boardIsFull(board Board) bool {
+	for i := 0; i < len(board); i++ {
+		for j := 0; j < len(board[i]); j++ {
+			if board[i][j] == Empty {
+				return false
+			}
+		}
+	}
+	return true
 }
 
-func getGameState(board Board, mark Cell) string {
-	state := ""
-	if isRowComplete(board, mark) {
-		state = "Won with rows"
+func getGameStatePlayer(board Board, mark Cell) GameState {
+	if isRowComplete(board, mark) || isColComplete(board, mark) || isDiagcomplete(board, mark) {
+		return Win
 	}
-	if isColComplete(board, mark) {
-		state = "Won with cols"
+	if boardIsFull(board) {
+		return Draw
+	}
+	return Running
+}
+
+func getGameState(board Board) (GameState, Cell) {
+	gameStateP1 := getGameStatePlayer(board, Ex)
+	gameStateP2 := getGameStatePlayer(board, Circle)
+
+	// If it's draw it's draw for both players
+	if gameStateP1 == Draw {
+		return gameStateP1, Empty
 	}
 
-	if isDiagcomplete(board, mark) {
-		state = "Won with diag"
+	if gameStateP1 == Win {
+		return gameStateP1, Ex
 	}
-	return state
+
+	if gameStateP2 == Win {
+		return gameStateP2, Circle
+	}
+
+	return gameStateP1, Empty
 }
 
 func changeMark(mark Cell) Cell {
