@@ -1,3 +1,3 @@
-module clitictactoe
+module tictacgo 
 
 go 1.21.6
