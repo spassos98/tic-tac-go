@@ -43,12 +43,16 @@ func printBoard(board Board) error {
 }
 
 func main() {
-	board := Board{
-		{Empty, Empty, Empty},
-		{Empty, Empty, Empty},
-		{Empty, Empty, Empty},
+	fmt.Println("Welcome to tic-tac-go!")
+	fmt.Println("Please enter the size of the board (an integer)")
+	var boardSize int
+	fmt.Scanf("%d", &boardSize)
+	fmt.Printf("You selected a size of %d\n", boardSize)
+	var board Board
+	for i := 0; i < boardSize; i++ {
+		row := make([]Cell, boardSize)
+		board = append(board, row)
 	}
-
 	printBoard(board)
 	play := -1
 	currentMark := Ex
@@ -61,14 +65,14 @@ func main() {
 			return
 		}
 
-		if play < 0 || play > 8 {
+		if play < 0 || play > (boardSize*boardSize)-1 {
 			fmt.Println("Please enter a number between 0 and 8")
 			continue
 		}
 
 		fmt.Println("")
-		positionX := play / 3
-		positionY := play % 3
+		positionX := play / boardSize
+		positionY := play % boardSize
 
 		if board[positionX][positionY] != Empty {
 			fmt.Println("That position is already occupied, try again")
@@ -77,6 +81,7 @@ func main() {
 		board[positionX][positionY] = currentMark
 		gameState, playerState := getGameState(board)
 		if gameState == Win {
+			printBoard(board)
 			if playerState == Ex {
 				fmt.Println("Player 1 Won!")
 			} else if playerState == Circle {
