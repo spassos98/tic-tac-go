@@ -1,5 +1,7 @@
 package main
 
+import "fmt"
+
 type move struct {
 	x int
 	y int
@@ -26,7 +28,7 @@ func getPossibleMoves(board Board) []move {
 	return moves
 }
 
-func findMinWithIndex(arr []int, operation int) (int, int) {
+func findMinWithIndex(arr []int) (int, int) {
 	minValue := 1 << 30
 	minIdx := 0
 	for idx, val := range arr {
@@ -48,6 +50,13 @@ func findMaxWithIndex(arr []int) (int, int) {
 		}
 	}
 	return maxValue, maxIdx
+}
+
+func printPossibleMoves(moves []move) {
+	fmt.Println("Possible Moves")
+	for _, m := range moves {
+		fmt.Printf("\t [%d, %d]\n", m.x, m.y)
+	}
 }
 
 func minmax(board Board, depth int) (int, move) {
@@ -88,7 +97,7 @@ func minmax(board Board, depth int) (int, move) {
 	if isFirstPlayer {
 		bestValue, bestMoveIdx = findMaxWithIndex(scores)
 	} else {
-		bestValue, bestMoveIdx = findMaxWithIndex(scores)
+		bestValue, bestMoveIdx = findMinWithIndex(scores)
 	}
 
 	return bestValue, moves[bestMoveIdx]

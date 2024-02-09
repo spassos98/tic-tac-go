@@ -49,11 +49,6 @@ func main() {
 		{Empty, Empty, Empty},
 	}
 
-	// board := Board{
-	// 	{Ex, Ex, Empty},
-	// 	{Empty, Circle, Empty},
-	// 	{Empty, Circle, Empty},
-	// }
 	printBoard(board)
 	play := -1
 	currentMark := Ex
@@ -91,10 +86,11 @@ func main() {
 		}
 		if gameState == Draw {
 			fmt.Println("It's a Draw")
+			break
 		}
 
 		// CPU turn
-		_, bestMove := minmax(board, 0)
+		_, bestMove := minmax(board, 1)
 		board[bestMove.x][bestMove.y] = Circle
 		printBoard(board)
 		gameState, playerState = getGameState(board)
