@@ -7,12 +7,18 @@ import (
 )
 
 type Cell int
+type GameMode int
 type Board [][]Cell
 
 const (
 	Empty  Cell = iota
 	Ex     Cell = iota
 	Circle Cell = iota
+)
+
+const (
+	PlayerVsCPU    GameMode = iota
+	PlayerVsPlayer GameMode = iota
 )
 
 func getCellRepresentation(cellValue Cell) (string, error) {
@@ -39,76 +45,45 @@ func printBoard(board Board) error {
 		}
 		fmt.Printf("%s\n", strings.Join(boardRow, " "))
 	}
+	fmt.Println("")
 	return nil
 }
 
-func main() {
-	fmt.Println("Welcome to tic-tac-go!")
-	fmt.Println("Please enter the size of the board (an integer)")
-	var boardSize int
-	fmt.Scanf("%d", &boardSize)
-	fmt.Printf("You selected a size of %d\n", boardSize)
+func initBoard(boardSize int) Board {
 	var board Board
 	for i := 0; i < boardSize; i++ {
 		row := make([]Cell, boardSize)
 		board = append(board, row)
 	}
+	return board
+}
+
+func main() {
+	fmt.Println("Welcome to tic-tac-go!")
+	boardSize := readBoardSize()
+	gameMode := readGameMode()
+	board := initBoard(boardSize)
 	printBoard(board)
-	play := -1
 	currentMark := Ex
 
 	for {
-		// User turn
-		_, err := fmt.Scanf("%d", &play)
-		if err != nil {
-			fmt.Println("Error:", err)
-			return
-		}
-
-		if play < 0 || play > (boardSize*boardSize)-1 {
-			fmt.Println("Please enter a number between 0 and 8")
-			continue
-		}
-
-		fmt.Println("")
-		positionX := play / boardSize
-		positionY := play % boardSize
-
-		if board[positionX][positionY] != Empty {
-			fmt.Println("That position is already occupied, try again")
-			continue
-		}
-		board[positionX][positionY] = currentMark
-		gameState, playerState := getGameState(board)
-		if gameState == Win {
-			printBoard(board)
-			if playerState == Ex {
-				fmt.Println("Player 1 Won!")
-			} else if playerState == Circle {
-				fmt.Println("Player 2 Won!")
-			}
-			break
-		}
-		if gameState == Draw {
-			fmt.Println("It's a Draw")
+		takePlayerTurn(board, currentMark)
+		if isGameFinished(board) {
 			break
 		}
 
-		// CPU turn
-		_, bestMove := minmax(board, 1)
-		board[bestMove.x][bestMove.y] = Circle
 		printBoard(board)
-		gameState, playerState = getGameState(board)
-		if gameState == Win {
-			if playerState == Ex {
-				fmt.Println("Player 1 Won!")
-			} else if playerState == Circle {
-				fmt.Println("Player 2 Won!")
-			}
-			break
+
+		if gameMode == PlayerVsCPU {
+			takeCpuTurn(board, Circle)
+		} else if gameMode == PlayerVsPlayer {
+			takePlayerTurn(board, Circle)
 		}
-		if gameState == Draw {
-			fmt.Println("It's a Draw")
+
+		printBoard(board)
+
+		if isGameFinished(board) {
+			break
 		}
 	}
 }

@@ -1,5 +1,7 @@
 package main
 
+import "fmt"
+
 type GameState int
 
 const (
@@ -112,4 +114,31 @@ func changeMark(mark Cell) Cell {
 		return Circle
 	}
 	return Ex
+}
+
+func checkGameState(board Board) GameState {
+	gameState, playerState := getGameState(board)
+	if gameState == Win {
+		printBoard(board)
+		if playerState == Ex {
+			fmt.Println("Player 1 Won!")
+		} else if playerState == Circle {
+			fmt.Println("Player 2 Won!")
+		}
+		return Win
+	}
+	if gameState == Draw {
+		printBoard(board)
+		fmt.Println("It's a Draw")
+		return Draw
+	}
+	return Running
+}
+
+func isGameFinished(board Board) bool {
+	gameState := checkGameState(board)
+	if gameState == Win || gameState == Draw {
+		return true
+	}
+	return false
 }
