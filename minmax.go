@@ -60,6 +60,9 @@ func printPossibleMoves(moves []move) {
 }
 
 func minmax(board Board, depth int) (int, move) {
+	if len(board) > 3 && depth >= len(board)*2-1 {
+		return 0, move{x: -1, y: -1}
+	}
 	isFirstPlayer := depth%2 == 0
 	var mark Cell
 	if isFirstPlayer {
@@ -91,6 +94,11 @@ func minmax(board Board, depth int) (int, move) {
 		scores = append(scores, score)
 		moves = append(moves, currentMove)
 		newBoard[currentMove.x][currentMove.y] = Empty
+		if isFirstPlayer && score > 1 {
+			break
+		} else if !isFirstPlayer && score < 0 {
+			break
+		}
 	}
 
 	var bestValue, bestMoveIdx int
