@@ -31,7 +31,8 @@ func takePlayerTurn(board Board, mark Cell) {
 	}
 }
 
-func takeCpuTurn(board Board, mark Cell) {
+func takeCpuTurn(board Board, mark Cell) (int, int) {
 	_, bestMove := minmax(board, 1)
 	board[bestMove.x][bestMove.y] = mark
+	return bestMove.x, bestMove.y
 }
