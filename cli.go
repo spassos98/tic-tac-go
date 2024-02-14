@@ -30,7 +30,7 @@ func main() {
 	termbox.SetInputMode(termbox.InputEsc | termbox.InputMouse)
 
 	boardSize := 3
-	squareSize := 5
+	squareSize := 7
 	canvas := NewBoardCanvas(boardSize, squareSize)
 	board := initBoard(boardSize)
 	currentMark := Ex
@@ -40,23 +40,7 @@ mainloop:
 	for {
 		mx, my := -1, -1
 		if !takingPlays {
-			termbox.Clear(termbox.ColorBlack, termbox.ColorDefault)
-			gameState, playerMark := getGameState(board)
-			var message string
-			if gameState == Win {
-				if playerMark == Ex {
-					message = "Player 1 won"
-				} else {
-					message = "Player 2 won"
-				}
-			} else {
-				message = "It's a ddddraw"
-			}
-			w, h := termbox.Size()
-			centerW := w / 2
-			centerH := h / 2
-			canvas.tbprint(centerW-len(message)/2, centerH, termbox.ColorWhite, termbox.ColorBlack, message)
-			termbox.Flush()
+			canvas.drawGameFinished(board)
 		}
 		switch ev := termbox.PollEvent(); ev.Type {
 		case termbox.EventKey:
@@ -76,9 +60,6 @@ mainloop:
 
 				if isGameFinished(board) {
 					takingPlays = false
-					termbox.Clear(termbox.ColorDefault, termbox.ColorDefault)
-					canvas.tbprint(0, 0, termbox.ColorWhite, termbox.ColorBlack, "Game finished")
-					termbox.Flush()
 					continue mainloop
 				}
 
@@ -87,9 +68,7 @@ mainloop:
 
 				if isGameFinished(board) {
 					takingPlays = false
-					termbox.Clear(termbox.ColorDefault, termbox.ColorDefault)
-					canvas.tbprint(0, 0, termbox.ColorWhite, termbox.ColorBlack, "Game finished")
-					termbox.Flush()
+					continue mainloop
 				}
 			}
 		}

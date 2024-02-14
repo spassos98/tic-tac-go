@@ -100,3 +100,20 @@ func (c boardCanvas) getPlayFromPixels(mx int, my int) (int, int) {
 	}
 	return -1, -1
 }
+
+func (c boardCanvas) drawGameFinished(board Board) {
+	termbox.Clear(termbox.ColorBlack, termbox.ColorDefault)
+	gameState, playerMark := getGameState(board)
+	var message string
+	if gameState == Win {
+		if playerMark == Ex {
+			message = "Player 1 won"
+		} else {
+			message = "Player 2 won"
+		}
+	} else {
+		message = "It's a ddddraw"
+	}
+	c.tbprint(c.centerW-len(message)/2, c.centerH, termbox.ColorWhite, termbox.ColorBlack, message)
+	termbox.Flush()
+}
