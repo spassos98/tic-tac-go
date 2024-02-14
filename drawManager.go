@@ -14,12 +14,20 @@ type boardCanvas struct {
 	centerW    int
 }
 
-func New(boardSize int, squareSize int) boardCanvas {
+func NewBoardCanvas(boardSize int, squareSize int) boardCanvas {
 	w, h := termbox.Size()
 
 	lengthSize := boardSize*squareSize + (boardSize - 1)
 	c := boardCanvas{boardSize, squareSize, lengthSize, h, w, h / 2, w / 2}
 	return c
+}
+
+func (c boardCanvas) tbprint(x, y int, fg, bg termbox.Attribute, msg string) {
+	for _, c := range msg {
+		termbox.SetCell(x, y, c, fg, bg)
+		x += 1
+	}
+	termbox.Flush()
 }
 
 func (c boardCanvas) drawSquare(x int, y int, size int) {
@@ -52,56 +60,43 @@ func (c boardCanvas) drawMark(positionX int, positionY int, mark Cell, boardSize
 	termbox.Flush()
 }
 
-//
-// func drawBoard() {
-// 	w, h := termbox.Size()
-// 	centerH := h / 2
-// 	centerW := w / 2
-// 	boardSize := 3
-// 	squareSize := 5
-// 	lengthSize := boardSize*squareSize + (boardSize - 1)
-// 	nLines := boardSize - 1
-// 	for i := 1; i <= nLines; i++ {
-// 		start := centerH - lengthSize/2
-// 		end := start + lengthSize
-// 		xMaxLeftSize := centerW - lengthSize/2 - 1
-// 		xPos := xMaxLeftSize + (squareSize+1)*i
-// 		for yPos := start; yPos < end; yPos++ {
-// 			termbox.SetCell(xPos, yPos, 1, termbox.ColorCyan, termbox.ColorCyan)
-// 		}
-// 	}
-//
-// 	for i := 1; i <= nLines; i++ {
-// 		start := centerW - lengthSize/2
-// 		end := start + lengthSize
-// 		yMaxLeftSize := centerH - lengthSize/2 - 1
-// 		yPos := yMaxLeftSize + (squareSize+1)*i
-// 		for xPos := start; xPos < end; xPos++ {
-// 			termbox.SetCell(xPos, yPos, 1, termbox.ColorCyan, termbox.ColorCyan)
-// 		}
-// 	}
-// 	termbox.Flush()
-// }
-//
-// func getPlayFromPixels(mx int, my int) (int, int) {
-// 	w, h := termbox.Size()
-// 	centerH := h / 2
-// 	centerW := w / 2
-// 	boardSize := 3
-// 	squareSize := 5
-// 	lengthSize := boardSize*squareSize + (boardSize - 1)
-// 	topLeftCornerX := centerW - lengthSize/2
-// 	topLeftCornerY := centerH - lengthSize/2
-// 	xPos, yPos := -1, -1
-// 	if mx >= topLeftCornerX && mx <= topLeftCornerX+lengthSize {
-// 		xPos = (mx - topLeftCornerX) / (squareSize + 1)
-// 	}
-// 	if my >= topLeftCornerY && my <= topLeftCornerY+lengthSize {
-// 		yPos = (my - topLeftCornerY) / (squareSize + 1)
-// 	}
-//
-// 	if my > 0 && mx > 0 {
-// 		return xPos, yPos
-// 	}
-// 	return -1, -1
-// }
+func (c boardCanvas) drawBoard() {
+	nLines := c.boardSize - 1
+	for i := 1; i <= nLines; i++ {
+		start := c.centerH - c.lengthSize/2
+		end := start + c.lengthSize
+		xMaxLeftSize := c.centerW - c.lengthSize/2 - 1
+		xPos := xMaxLeftSize + (c.squareSize+1)*i
+		for yPos := start; yPos < end; yPos++ {
+			termbox.SetCell(xPos, yPos, 1, termbox.ColorCyan, termbox.ColorCyan)
+		}
+	}
+
+	for i := 1; i <= nLines; i++ {
+		start := c.centerW - c.lengthSize/2
+		end := start + c.lengthSize
+		yMaxLeftSize := c.centerH - c.lengthSize/2 - 1
+		yPos := yMaxLeftSize + (c.squareSize+1)*i
+		for xPos := start; xPos < end; xPos++ {
+			termbox.SetCell(xPos, yPos, 1, termbox.ColorCyan, termbox.ColorCyan)
+		}
+	}
+	termbox.Flush()
+}
+
+func (c boardCanvas) getPlayFromPixels(mx int, my int) (int, int) {
+	topLeftCornerX := c.centerW - c.lengthSize/2
+	topLeftCornerY := c.centerH - c.lengthSize/2
+	xPos, yPos := -1, -1
+	if mx >= topLeftCornerX && mx <= topLeftCornerX+c.lengthSize {
+		xPos = (mx - topLeftCornerX) / (c.squareSize + 1)
+	}
+	if my >= topLeftCornerY && my <= topLeftCornerY+c.lengthSize {
+		yPos = (my - topLeftCornerY) / (c.squareSize + 1)
+	}
+
+	if my > 0 && mx > 0 {
+		return xPos, yPos
+	}
+	return -1, -1
+}
