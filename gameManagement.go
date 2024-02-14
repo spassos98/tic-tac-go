@@ -10,6 +10,15 @@ const (
 	Running GameState = iota
 )
 
+func initBoard(boardSize int) Board {
+	var board Board
+	for i := 0; i < boardSize; i++ {
+		row := make([]Cell, boardSize)
+		board = append(board, row)
+	}
+	return board
+}
+
 func isRowComplete(board Board, mark Cell) bool {
 	for i := 0; i < len(board); i++ {
 		base := board[i][0]
@@ -109,17 +118,9 @@ func getGameState(board Board) (GameState, Cell) {
 	return gameStateP1, Empty
 }
 
-func changeMark(mark Cell) Cell {
-	if mark == Ex {
-		return Circle
-	}
-	return Ex
-}
-
 func checkGameState(board Board) GameState {
 	gameState, playerState := getGameState(board)
 	if gameState == Win {
-		printBoard(board)
 		if playerState == Ex {
 			fmt.Println("Player 1 Won!")
 		} else if playerState == Circle {
@@ -128,7 +129,6 @@ func checkGameState(board Board) GameState {
 		return Win
 	}
 	if gameState == Draw {
-		printBoard(board)
 		fmt.Println("It's a Draw")
 		return Draw
 	}
