@@ -1,10 +1,8 @@
 package main
 
 import (
-	"errors"
 	"fmt"
 	"github.com/nsf/termbox-go"
-	"strings"
 )
 
 type Cell int
@@ -22,45 +20,6 @@ const (
 	PlayerVsPlayer GameMode = iota
 )
 
-func getCellRepresentation(cellValue Cell) (string, error) {
-	switch cellValue {
-	case Empty:
-		return "_", nil
-	case Ex:
-		return "X", nil
-	case Circle:
-		return "O", nil
-	}
-	return "", errors.New("No representation found for given cell value")
-}
-
-func printBoard(board Board) error {
-	for i := 0; i < len(board); i++ {
-		boardRow := make([]string, len(board))
-		var err error
-		for j := 0; j < len(board[i]); j++ {
-			boardRow[j], err = getCellRepresentation(board[i][j])
-			if err != nil {
-				return errors.New("Could not reprenst cell value")
-			}
-		}
-		fmt.Printf("%s\n", strings.Join(boardRow, " "))
-	}
-	fmt.Println("")
-	return nil
-}
-
-func initBoard(boardSize int) Board {
-	var board Board
-	for i := 0; i < boardSize; i++ {
-		row := make([]Cell, boardSize)
-		board = append(board, row)
-	}
-	return board
-}
-
-var current string
-
 func main() {
 	err := termbox.Init()
 	if err != nil {
@@ -76,7 +35,6 @@ func main() {
 	board := initBoard(boardSize)
 	currentMark := Ex
 	canvas.drawBoard()
-	// drawBoard()
 	takingPlays := true
 mainloop:
 	for {
