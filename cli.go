@@ -51,6 +51,10 @@ mainloop:
 			if ev.Key == termbox.MouseLeft && takingPlays {
 				mx, my = ev.MouseX, ev.MouseY
 			}
+		case termbox.EventResize:
+			termbox.Clear(termbox.ColorBlack, termbox.ColorDefault)
+			canvas.resizeBoardCanvas()
+			canvas.redrawEverything(board)
 		}
 		if takingPlays {
 			xPos, yPos := canvas.getPlayFromPixels(mx, my)
@@ -60,7 +64,7 @@ mainloop:
 					continue mainloop
 				}
 				board[xPos][yPos] = currentMark
-				canvas.drawMark(xPos, yPos, currentMark, len(board))
+				canvas.drawMark(xPos, yPos, currentMark)
 				canvas.clearOccupiedCellMessage()
 
 				if isGameFinished(board) {
@@ -69,7 +73,7 @@ mainloop:
 				}
 
 				cpuXPos, cpuYPos := takeCpuTurn(board, Circle)
-				canvas.drawMark(cpuXPos, cpuYPos, Circle, len(board))
+				canvas.drawMark(cpuXPos, cpuYPos, Circle)
 
 				if isGameFinished(board) {
 					takingPlays = false
