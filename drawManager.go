@@ -1,9 +1,8 @@
 package main
 
 import (
-	"strings"
-
 	"github.com/nsf/termbox-go"
+	"strings"
 )
 
 type boardCanvas struct {
@@ -24,6 +23,14 @@ func NewBoardCanvas(boardSize int, squareSize int) boardCanvas {
 	lengthSize := boardSize*squareSize + (boardSize - 1)
 	c := boardCanvas{boardSize, squareSize, lengthSize, h, w, h / 2, w / 2}
 	return c
+}
+
+func (c *boardCanvas) resizeBoardCanvas() {
+	w, h := termbox.Size()
+	c.height = h
+	c.width = w
+	c.centerH = h / 2
+	c.centerW = w / 2
 }
 
 func (c boardCanvas) tbprint(x, y int, fg, bg termbox.Attribute, msg string) {
@@ -59,7 +66,7 @@ func (c boardCanvas) drawEx(x int, y int, size int) {
 	}
 }
 
-func (c boardCanvas) drawMark(positionX int, positionY int, mark Cell, boardSize int) {
+func (c boardCanvas) drawMark(positionX int, positionY int, mark Cell) {
 	topLeftCornerX := c.centerW - c.lengthSize/2
 	topLeftCornerY := c.centerH - c.lengthSize/2
 	xPos := topLeftCornerX + (c.squareSize+1)*positionX
@@ -69,6 +76,15 @@ func (c boardCanvas) drawMark(positionX int, positionY int, mark Cell, boardSize
 		c.drawEx(xPos+1, yPos+1, c.squareSize-2)
 	} else if mark == Circle {
 		c.drawSquare(xPos+1, yPos+1, c.squareSize-2)
+	}
+	termbox.Flush()
+}
+
+func (c boardCanvas) drawAllMarks(board Board) {
+	for xPos, row := range board {
+		for yPos, mark := range row {
+			c.drawMark(xPos, yPos, mark)
+		}
 	}
 	termbox.Flush()
 }
@@ -97,6 +113,13 @@ func (c boardCanvas) drawBoard() {
 	termbox.Flush()
 }
 
+func (c boardCanvas) redrawEverything(board Board) {
+	// termbox.Clear(termbox.ColorDefault, termbox.ColorDefault)
+	c.drawBoard()
+	c.drawAllMarks(board)
+	c.clearOccupiedCellMessage()
+}
+
 func (c boardCanvas) getPlayFromPixels(mx int, my int) (int, int) {
 	topLeftCornerX := c.centerW - c.lengthSize/2
 	topLeftCornerY := c.centerH - c.lengthSize/2
@@ -115,7 +138,7 @@ func (c boardCanvas) getPlayFromPixels(mx int, my int) (int, int) {
 }
 
 func (c boardCanvas) drawGameFinished(board Board) {
-	termbox.Clear(termbox.ColorBlack, termbox.ColorDefault)
+	termbox.Clear(termbox.ColorDefault, termbox.ColorDefault)
 	gameState, playerMark := getGameState(board)
 	var message string
 	if gameState == Win {
