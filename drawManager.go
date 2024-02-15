@@ -1,6 +1,8 @@
 package main
 
 import (
+	"strings"
+
 	"github.com/nsf/termbox-go"
 )
 
@@ -13,6 +15,8 @@ type boardCanvas struct {
 	centerH    int
 	centerW    int
 }
+
+const cellOccupiedMessage = "That cell is already occupied"
 
 func NewBoardCanvas(boardSize int, squareSize int) boardCanvas {
 	w, h := termbox.Size()
@@ -28,6 +32,15 @@ func (c boardCanvas) tbprint(x, y int, fg, bg termbox.Attribute, msg string) {
 		x += 1
 	}
 	termbox.Flush()
+}
+
+func (c boardCanvas) printOccupiedCellMessage() {
+	c.tbprint(c.centerW-len(cellOccupiedMessage)/2, 2, termbox.ColorWhite, termbox.ColorBlack, cellOccupiedMessage)
+	termbox.Flush()
+}
+
+func (c boardCanvas) clearOccupiedCellMessage() {
+	c.tbprint(c.centerW-len(cellOccupiedMessage)/2, 2, termbox.ColorDefault, termbox.ColorDefault, strings.Repeat(" ", len(cellOccupiedMessage)))
 }
 
 func (c boardCanvas) drawSquare(x int, y int, size int) {

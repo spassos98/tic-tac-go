@@ -55,8 +55,13 @@ mainloop:
 		if takingPlays {
 			xPos, yPos := canvas.getPlayFromPixels(mx, my)
 			if xPos > -1 && yPos > -1 {
+				if board[xPos][yPos] != Empty {
+					canvas.printOccupiedCellMessage()
+					continue mainloop
+				}
 				board[xPos][yPos] = currentMark
 				canvas.drawMark(xPos, yPos, currentMark, len(board))
+				canvas.clearOccupiedCellMessage()
 
 				if isGameFinished(board) {
 					takingPlays = false
