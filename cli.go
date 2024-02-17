@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/nsf/termbox-go"
+	"time"
 )
 
 type Cell int
@@ -36,11 +37,26 @@ func main() {
 	currentMark := Ex
 	canvas.drawBoard()
 	takingPlays := true
+	var start time.Time
+	endScreenTime := 1 * time.Second
 mainloop:
 	for {
 		mx, my := -1, -1
 		if !takingPlays {
-			canvas.drawGameFinished(board)
+			if time.Since(start) >= endScreenTime {
+				canvas.drawGameFinished(board)
+				switch ev := termbox.PollEvent(); ev.Type {
+				case termbox.EventKey:
+					if ev.Key == termbox.KeyEsc {
+						break mainloop
+					}
+				case termbox.EventMouse:
+					if ev.Key == termbox.MouseLeft {
+						break mainloop
+					}
+				}
+			}
+			continue
 		}
 		switch ev := termbox.PollEvent(); ev.Type {
 		case termbox.EventKey:
@@ -56,29 +72,29 @@ mainloop:
 			canvas.resizeBoardCanvas()
 			canvas.redrawEverything(board)
 		}
-		if takingPlays {
-			xPos, yPos := canvas.getPlayFromPixels(mx, my)
-			if xPos > -1 && yPos > -1 {
-				if board[xPos][yPos] != Empty {
-					canvas.printOccupiedCellMessage()
-					continue mainloop
-				}
-				board[xPos][yPos] = currentMark
-				canvas.drawMark(xPos, yPos, currentMark)
-				canvas.clearOccupiedCellMessage()
+		xPos, yPos := canvas.getPlayFromPixels(mx, my)
+		if xPos > -1 && yPos > -1 {
+			if board[xPos][yPos] != Empty {
+				canvas.printOccupiedCellMessage()
+				continue mainloop
+			}
+			board[xPos][yPos] = currentMark
+			canvas.drawMark(xPos, yPos, currentMark)
+			canvas.clearOccupiedCellMessage()
 
-				if isGameFinished(board) {
-					takingPlays = false
-					continue mainloop
-				}
+			if isGameFinished(board) {
+				takingPlays = false
+				start = time.Now()
+				continue mainloop
+			}
 
-				cpuXPos, cpuYPos := takeCpuTurn(board, Circle)
-				canvas.drawMark(cpuXPos, cpuYPos, Circle)
+			cpuXPos, cpuYPos := takeCpuTurn(board, Circle)
+			canvas.drawMark(cpuXPos, cpuYPos, Circle)
 
-				if isGameFinished(board) {
-					takingPlays = false
-					continue mainloop
-				}
+			if isGameFinished(board) {
+				takingPlays = false
+				start = time.Now()
+				continue mainloop
 			}
 		}
 	}
