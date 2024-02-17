@@ -8,7 +8,7 @@ I implemented a tic-tac-toe game which can be played via [console](https://githu
 
 - Clone the repository
 - `go mod tidy` to install the dependencies
-- go run .
+- `go run .`
 
 ## References
 
